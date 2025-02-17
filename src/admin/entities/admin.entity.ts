@@ -1,10 +1,10 @@
 
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity()
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+@Entity('admin')
+export class Admin {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   name: string;
