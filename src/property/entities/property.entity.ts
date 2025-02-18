@@ -1,19 +1,15 @@
 
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()
 export class Property {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   title: string;
 
-  @Column()
-  description: string;
-
-  @Column()
+  @Column('decimal', { precision: 10, scale: 2 })
   price: number;
 
   @Column()
@@ -28,11 +24,23 @@ export class Property {
   @Column()
   bathrooms: number;
 
-  @Column('text', { array: true, default: [] })
+  @Column('text')
+  description: string;
+
+  @Column('text', { array: true })
   images: string[];
 
-  @ManyToOne(() => User)
-  owner: User;
+  @Column('text', { array: true })
+  videos: string[];
+
+  @Column('text', { nullable: true })
+  floorPlan: string;
+
+  @Column('text', { array: true })
+  features: string[];
+
+  @Column()
+  squareFootage: number;
 
   @CreateDateColumn()
   createdAt: Date;

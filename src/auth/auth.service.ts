@@ -32,6 +32,7 @@ export class AuthService {
         id: user.id,
         email: user.email,
         name: user.name,
+        isAdmin: user.isAdmin,
       },
       access_token,
     };
@@ -42,6 +43,7 @@ export class AuthService {
     const user = await this.userService.create({
       ...registerDto,
       password: hashedPassword,
+      isAdmin: false,
     });
 
     const payload = { sub: user.id, email: user.email };
@@ -52,6 +54,7 @@ export class AuthService {
         id: user.id,
         email: user.email,
         name: user.name,
+        isAdmin: user.isAdmin,
       },
       access_token,
     };
@@ -101,6 +104,20 @@ export class AuthService {
         isAdmin: true,
       },
       access_token,
+    };
+  }
+
+  async getCurrentUser(userId: number) {
+    const user = await this.userService.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      isAdmin: user.isAdmin,
     };
   }
 }

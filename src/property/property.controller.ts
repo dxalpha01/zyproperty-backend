@@ -1,9 +1,9 @@
 
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseInterceptors, UploadedFiles, UploadedFile } from '@nestjs/common';
 import { PropertyService } from './property.service';
 import { CreatePropertyDto } from './dto/create-property.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('properties')
 @Controller('properties')
@@ -11,10 +11,25 @@ export class PropertyController {
   constructor(private readonly propertyService: PropertyService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  create(@Body() createPropertyDto: CreatePropertyDto) {
-    return this.propertyService.create(createPropertyDto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileFieldsInterceptor([
+    { name: 'images', maxCount: 10 },
+    { name: 'videos', maxCount: 5 },
+    { name: 'floorPlan', maxCount: 1 },
+  ]))
+  async create(
+    @Body() createPropertyDto: CreatePropertyDto,
+    @UploadedFiles() files: {
+      images?: Express.Multer.File[],
+      videos?: Express.Multer.File[],
+      floorPlan?: Express.Multer.File[]
+    }
+  ) {
+    return this.propertyService.create(createPropertyDto, {
+      images: files.images,
+      videos: files.videos,
+      floorPlan: files.floorPlan?.[0],
+    });
   }
 
   @Get()
@@ -24,6 +39,6 @@ export class PropertyController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.propertyService.findOne(+id);
+    return this.propertyService.findOne(id);
   }
 }
